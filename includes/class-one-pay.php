@@ -120,6 +120,7 @@ class One_Pay {
 		
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-register.php';
+		
 
 		
 

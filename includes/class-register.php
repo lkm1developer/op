@@ -1,5 +1,6 @@
 <?php
-use \Curl\Curl;
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Client.php';
+use Includes\Client;
 
 class OnePayRegister {
 
@@ -10,6 +11,13 @@ class OnePayRegister {
 	 *
 	 * @since    1.0.0
 	 */
+	 
+	 public function __construct()
+	 {
+			$this->curl = new Includes\Client();
+			
+			
+	 }
 	public  function Register() {
 		
 		global $wpdb;
@@ -25,7 +33,7 @@ class OnePayRegister {
 		 $admin_email = get_option('admin_email');
 		$user = get_user_by( 'email', $admin_email );
 		$user=$user->data;
-		var_dump($user);
+		
 		$user_data=array(
 							  "user"=>array(
 								"email"=>$user->user_email,
@@ -40,15 +48,10 @@ class OnePayRegister {
 							  )
 						  );
 						  
-						  
-			$curl = new Curl();
-			$curl->post('https://app.kachyng.com/api/v2/accounts/sessions/create', $user_data);
-			if ($curl->error) {
-				echo 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage . "\n";
-			} else {
-				echo 'Response:' . "\n";
-				var_dump($curl->response);
-			}				  
+					  
+		$res=	$this->curl->HttpPost('accounts/sessions/create',$user_data);		  
+		var_dump($res);	
+			
 		
 			
 	}
