@@ -21,7 +21,8 @@ class Client
 	 
 	 public function __construct()
 	 {
-			$this->ApiUrl='https://app.kachyng.com/api/v2/';
+			//$this->ApiUrl='https://app.kachyng.com/api/v2/';
+			$this->ApiUrl='https://dev.kachyng.com/api/v2/';
 			$this->curl = new Curl();
 			$this->curl->setHeader('X-Requested-With', 'application/json');
 			$this->curl->setHeader('Content-Type', 'application/json');

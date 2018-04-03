@@ -85,6 +85,37 @@ foreach ($d as $filename)
  */
 add_shortcode('kachyng','kachyng');
  function kachyng(){
-	$OnePayRegister=new OnePayRegister;
-	$OnePayRegister->Register();
-} 
+	//$OnePayRegister=new OnePayRegister;
+	//$OnePayRegister->Register();
+	require_once plugin_dir_path( __FILE__ ) . 'includes/html.php';
+	MerchantRegister_html();
+}
+
+/* add menu page */
+
+
+function wpdocs_register_one_pay_menu_page() {
+    add_menu_page(
+        __( 'One Pay', 'One Pay' ),
+        'One Pay',
+        'manage_options',
+        'one_pay_menu',
+        'one_pay_menu',
+        plugins_url( 'one-pay/images/icon.png' ),
+        6
+    );
+}
+add_action( 'admin_menu', 'wpdocs_register_one_pay_menu_page' ); 
+add_action('admin_enqueue_scripts', 'load_onepay_scripts');
+
+
+function one_pay_menu(){
+	require_once plugin_dir_path( __FILE__ ) . 'includes/html.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-function.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-one_pay_menu.php';
+	
+}
+
+function load_onepay_scripts(){
+	 wp_enqueue_script('script', plugins_url( 'one-pay/js/onepay.js' ));
+}
