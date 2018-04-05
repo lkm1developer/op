@@ -2,7 +2,17 @@
 
 Class OnePayFunctions 
 	{
-	
+		public function __construct()
+	 {
+			$api=array(
+						'apiKey'=>get_option('kach_merchat_apiKey'),
+						'apiSecretKey'=>get_option('kach_merchat_secretKey'));
+					
+						
+			$this->curl = new Includes\Client($api);
+			
+			
+	 }	
 		
 		public function kachMerchantDetails()
 		{
@@ -15,6 +25,8 @@ Class OnePayFunctions
 				$data->secretKey=get_option('kach_merchat_secretKey');
 				$data->authenticationKey=get_option('kach_merchat_authenticationKey');
 				$data->password=get_option('kach_merchat_password');
+			 	$data->email=get_option('kach_merchat_email');
+			 	$data->name=get_option('kach_merchat_name');
 			 	 return $data;
 			 }
 			 else{
@@ -69,11 +81,47 @@ Class OnePayFunctions
 			$products = get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1') );
 			if($products){
 				foreach($products as $item){
-					$item_id=$item->id;
-					$sync=get_post_meta('one_pay',$item_id,true);
+					
+					$sync=get_post_meta($item,'one_pay',true);
 					if(!$sync){
-						$this->SetupForSyncProduct($item);
+						$product=$this->SetupForSyncProduct($item);
+						$curl = curl_init();
+							//echo json_encode($product,true);die();
+							curl_setopt_array($curl, array(
+							  CURLOPT_URL => "https://dev.kachyng.com/api/v2/buy/product/add",
+							  CURLOPT_RETURNTRANSFER => true,
+							  CURLOPT_ENCODING => "",
+							  CURLOPT_MAXREDIRS => 10,
+							  CURLOPT_TIMEOUT => 30,
+							  CURLOPT_SSL_VERIFYHOST=>0,
+							CURLOPT_SSL_VERIFYPEER=>0,
+							  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+							  CURLOPT_CUSTOMREQUEST => "POST",
+							  CURLOPT_POSTFIELDS =>  '{"apiKey":"gu7XeGszu8S6b2pMfcJjDvUnTfiN7Wfv","cartItems":[{"name":"Vneck Tshirt","imageURL":"http:\/\/localhost\/kach\/wp-content\/uploads\/2018\/03\/vneck-tee.jpg","uPCEAN":"11111","standardCost":"18","standardQuantity":"1000","description":"Pellentesque habitant","Brand":"","longDescription":"Pellentesque","isTaxable":"Y","isSale":"N","isShipping":"","width ":"","Height":"","Depth":"","whlUnit":"","Weight":"","weightUnit":"","properitaryUrl":""}]}',
+							 
+							  CURLOPT_HTTPHEADER => array(
+								"Authorization: Basic YXBpS2V5Om5NanFSeTcxR1ZmSGFiam00cmQ0Sk13WkQ0MlRkVGlp",
+								"Cache-Control: no-cache",
+								"Content-Type: application/json",
+								"Postman-Token: 80907bea-1054-4db3-a8fa-be87142b6f81",
+								"apiKey: nMjqRy71GVfHabjm4rd4JMwZD42TdTii"
+							  ),
+							));
+
+							$response = curl_exec($curl);
+							$err = curl_error($curl);
+
+							curl_close($curl);
+
+							if ($err) {
+							  echo "cURL Error #:" . $err;
+							} else {
+							  echo $response;
+							}
 						
+						//$res=	$this->curl->HttpPost('buy/product/add',$product);
+						//var_dump($res);
+						die();
 					}
 					
 				}
@@ -84,31 +132,48 @@ Class OnePayFunctions
 		 //////////////////////////////////////////////////
 		
 		public function SetupForSyncProduct($item){
-			$data=array(
-						'name'=>$item->title,
-						'imageURL'=>'',						
-						'uPCEAN'=>'',
-						'standardCost'=>'',
-						'standardQuantity'=>'',
-						'description'=>'',
-						'Category'=>'',
+			
+			
+			$_product = new WC_Product($item);
+			$category_ids=$_product->category_ids;
+			$cat=null;
+			if(is_array($category_ids)){
+				
+				foreach($category_ids as $c){
+					
+					$cat .=get_the_category_by_ID(  $c ) .' , ';
+					
+				}
+			}
+			 $data= array(
+						'apiKey'=>get_option('kach_merchat_apiKey'),
+						
+						'cartItems'=>array(
+						'name'=>$_product->name,
+						'imageURL'=>get_the_post_thumbnail_url( $item),						
+						'uPCEAN'=>time(),
+						'standardCost'=>$_product->price,
+						'standardQuantity'=>$_product->stock_quantity?$_product->stock_quantity:1000,
+						'description'=>$_product->description,
+						'Category'=>$cat,
 						'Brand'=>'',
-						'longDescription'=>'',
-						'isTaxable'=>'',
-						'isSale'=>'',
+						'longDescription'=>$_product->description,
+						'isTaxable'=>$_product->tax_status?'Y':'N',
+						'isSale'=>get_post_meta($item,'_sale_price',true)?'Y':'N',
 						'isShipping'=>'',
-						'width '=>'',
-						'Height'=>'',
-						'Depth'=>'',
+						'width '=>get_post_meta($item,'_width',true),
+						'Height'=>get_post_meta($item,'height',true),
+						'Depth'=>get_post_meta($item,'length',true),
 						'whlUnit'=>'',
-						'Weight'=>'',
+						'Weight'=>get_post_meta($item,'weight',true),
 						'weightUnit'=>'',
 						'properitaryUrl'=>''
 						
-						);
-
-
-			
+						));
+						
+						$data= (object)$data;
+						return $data;
+						
 		}
 	
 	

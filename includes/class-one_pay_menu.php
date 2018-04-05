@@ -4,4 +4,5 @@
 	
 	$OnePayFunctions->IsMerchantRegistered();
 	$OnePayFunctions->SyncProductToOnePay();
+	//$OnePayFunctions->StartSyncProductToOnePay();
 

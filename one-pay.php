@@ -117,5 +117,60 @@ function one_pay_menu(){
 }
 
 function load_onepay_scripts(){
-	 wp_enqueue_script('script', plugins_url( 'one-pay/js/onepay.js' ));
+	 wp_enqueue_script('one-pay', plugins_url( 'one-pay/js/onepay.js' ));
+	 wp_localize_script( 'one-pay', 'ajax_object',
+            array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1234 ) );
 }
+
+
+add_action( 'wp_ajax_nopriv_onepay_merchant_reg', 'OnePayRegisterAjax' );
+add_action( 'wp_ajax_onepay_merchant_reg', 'OnePayRegisterAjax' );
+
+function OnePayRegisterAjax(){
+	$data['email']=$_POST['email'];
+	$data['name']=$_POST['name'];
+	
+	$OnePayRegister=new OnePayRegister;
+	$OnePRegister=$OnePayRegister->Register($data);
+	echo json_encode($OnePRegister);
+	wp_die();
+	
+}
+
+
+add_action( 'wp_ajax_nopriv_onepay_productsync', 'OnePayProductSyncAjax' );
+add_action( 'wp_ajax_onepay_productsync', 'OnePayProductSyncAjax' );
+
+function OnePayProductSyncAjax(){
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-function.php';
+	$OnePayFunctions=new OnePayFunctions;
+	$sync=$OnePayFunctions->StartSyncProductToOnePay();
+	
+	echo json_encode($sync);
+	wp_die();
+	
+}
+
+add_action('woocommerce_thankyou', 'user_register_op', 10, 1);
+function user_register_op( $order_id ) {
+
+    if ( ! $order_id )
+        return;
+
+    // Getting an instance of the order object
+    $order = wc_get_order( $order_id );
+	
+	$Register=new OnePayRegister; 
+	$res=$Register->UserRegisterOnOnePay($order);
+	
+    if($res->success==true){
+		$res=$Register->UserAddProduct($order,$res);
+		
+	}
+}
+
+
+
+
+
+

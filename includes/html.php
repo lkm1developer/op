@@ -1,15 +1,10 @@
 <?php 
 
 	function MerchantRegister_html(){ 
-		$str='<div id="message" class="updated woocommerce-message "style="display:block !important;">
+		$str='<div id="message" class="updated woocommerce-message onepatmaindiv"style="display:block !important;">
+		<button class="getLoginStatus">getLoginStatus</button>
 		<div id="fb-root"></div>
-		<script>(function(d, s, id) {
-		  var js, fjs = d.getElementsByTagName(s)[0];
-		  if (d.getElementById(id)) return;
-		  js = d.createElement(s); js.id = id;
-		  js.src = "https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.12&appId=211344289625310&autoLogAppEvents=1";
-		  fjs.parentNode.insertBefore(js, fjs);
-		}(document, "script", "facebook-jssdk"));</script>
+		<script></script>
 
 		<p class="main"><strong>Register as Merchant @ One Pay </strong></p>
 		<p>Shipping is currently enabled, but you have not added any shipping methods to your shipping zones.</p>
@@ -35,6 +30,8 @@
 	
 
 		<p class="main"><strong>Your Details as Merchant @ One Pay </strong></p>
+		<p>Merchant Name: '.$data->name.'</p><br>
+		<p>Email: '.$data->email.'</p><br>
 		<p>API Key: </p><p>'.$data->apiKey.'</p><br>
 		<p>Secret Key : </p><p>'.$data->secretKey.'</p><br>
 		<p>Authentication Key : </p><p>'.$data->authenticationKey.'</p><br>
@@ -64,7 +61,7 @@
 
 		<p class="main"><strong>Total Product '.$total_products.' </strong></p>
 		<p class="main"><strong>To Sync Product '.$total_products.' </strong></p>
-		<p class="main"><button class="btn btn-primary">Sync Product '.$total_products.' </button></p>';
+		<p class="main"><button id="_opsync"class="btn btn-primary">Sync Product '.$total_products.' </button></p>';
 		
 		
 		echo $str;
