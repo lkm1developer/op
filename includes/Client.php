@@ -44,7 +44,7 @@ class Client
 			
 			
 			$c=$this->curl->post($this->ApiUrl.$url, $data);
-			
+			var_dump($this->ApiUrl.$url);
 			if ($this->curl->error) {
 				return  'Error: ' . $this->curl->errorCode . ': ' . $this->curl->errorMessage . "\n";
 			} else {

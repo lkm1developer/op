@@ -97,7 +97,8 @@ Class OnePayFunctions
 							CURLOPT_SSL_VERIFYPEER=>0,
 							  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 							  CURLOPT_CUSTOMREQUEST => "POST",
-							  CURLOPT_POSTFIELDS =>  '{"apiKey":"gu7XeGszu8S6b2pMfcJjDvUnTfiN7Wfv","cartItems":[{"name":"Vneck Tshirt","imageURL":"http:\/\/localhost\/kach\/wp-content\/uploads\/2018\/03\/vneck-tee.jpg","uPCEAN":"11111","standardCost":"18","standardQuantity":"1000","description":"Pellentesque habitant","Brand":"","longDescription":"Pellentesque","isTaxable":"Y","isSale":"N","isShipping":"","width ":"","Height":"","Depth":"","whlUnit":"","Weight":"","weightUnit":"","properitaryUrl":""}]}',
+							  CURLOPT_POSTFIELDS =>  /* '{"apiKey":"gu7XeGszu8S6b2pMfcJjDvUnTfiN7Wfv","cartItems":[{"name":"Vneckdd","imageURL":"vneck-tee.jpg","uPCEAN":123456789102,"standardCost":"18","standardQuantity":"1000","description":"Pellentesque habitant","Brand":"","longDescription":"Pellentesque","isTaxable":"Y","isSale":"N","isShipping":"","width ":"","Height":"","Depth":"","whlUnit":"","Weight":"","weightUnit":"","properitaryUrl":""}]}' */
+							  json_encode($product,true),
 							 
 							  CURLOPT_HTTPHEADER => array(
 								"Authorization: Basic YXBpS2V5Om5NanFSeTcxR1ZmSGFiam00cmQ0Sk13WkQ0MlRkVGlp",
@@ -148,10 +149,10 @@ Class OnePayFunctions
 			 $data= array(
 						'apiKey'=>get_option('kach_merchat_apiKey'),
 						
-						'cartItems'=>array(
+						'cartItems'=>array([
 						'name'=>$_product->name,
 						'imageURL'=>get_the_post_thumbnail_url( $item),						
-						'uPCEAN'=>time(),
+						'uPCEAN'=>123456789102,
 						'standardCost'=>$_product->price,
 						'standardQuantity'=>$_product->stock_quantity?$_product->stock_quantity:1000,
 						'description'=>$_product->description,
@@ -169,9 +170,11 @@ Class OnePayFunctions
 						'weightUnit'=>'',
 						'properitaryUrl'=>''
 						
-						));
+						]));
 						
 						$data= (object)$data;
+						//var_dump($data);die();
+						echo json_encode($data);die();
 						return $data;
 						
 		}

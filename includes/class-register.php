@@ -144,17 +144,17 @@ class OnePayRegister {
 						  "upc"=>324,
 						  "active"=>true,
 						  "description"=> 'this is hat hat',
-						  "images"=> array(
+						  "images"=> [
 							""
-						  ),
-						  "package_dimensions"=> array(
+						  ],
+						  "package_dimensions"=> [
 													"height"=> 0,
 													"length"=>0,
 													"width"=> 0,
 													"length_unit"=> "string",
 													"weight"=> 0,
 													"weight_unit"=> "string"
-												  ),
+												 ],
 						  "shippable"=> true,
 						  "google_category"=> "string",
 						  "taxable"=> true,
@@ -162,7 +162,7 @@ class OnePayRegister {
 						  "sale_price"=> 10.99,
 						
 						  
-						  "cartAddress"=> array(
+						  "cartAddress"=> [
 											
 											  "addressLine1"=>$data['billing']['address_1'],
 											  "addressLine2"=> $data['billing']['address_2'],
@@ -171,11 +171,12 @@ class OnePayRegister {
 											  "region"=> $data['billing']['state'],
 											  "postalCode"=> $data['billing']['postcode']
 											
-										  )
+										  ]
 						)
 		  );
+		 $user_data=json_encode($user_data,true); 
 		echo '<pre>';  
-		$res=	$this->curl->HttpPost('buy/product/addCart ',$user_data);
+		$res=	$this->curl->HttpPost('buy/product/addCart',$user_data);
 		
 		var_dump($user_data);var_dump($res);die();
 		return $res;
