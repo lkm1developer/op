@@ -73,16 +73,35 @@ Class OnePayFunctions
 		
 		// start syncing woo-com product 
 		 public function SyncProductToOnePay(){
-			 ShowTotalProduct_html();
+			 $total_products = count( get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1') ) );
+			 $tosync = count(get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1',
+			'meta_query' => array(
+					array(
+					 'key' => 'one_pay',
+					 'compare' => 'NOT EXISTS' // this should work...
+					)
+				)
+			) ));
+			 ShowTotalProduct_html($total_products,$tosync);
 		 }
 		 
 		 
 		public function StartSyncProductToOnePay(){
-			$products = get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1') );
-			if($products){
+			$products = get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1',
+			'meta_query' => array(
+					array(
+					 'key' => 'one_pay',
+					 'compare' => 'NOT EXISTS' // this should work...
+					)
+				)
+			) );
+	
+			
+			if(count($products)>0){//var_dump($products);	die();
 				foreach($products as $item){
 					
 					$sync=get_post_meta($item,'one_pay',true);
+					
 					if(!$sync){
 						$product=$this->SetupForSyncProduct($item);
 						$curl = curl_init();
@@ -97,15 +116,14 @@ Class OnePayFunctions
 							CURLOPT_SSL_VERIFYPEER=>0,
 							  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 							  CURLOPT_CUSTOMREQUEST => "POST",
-							  CURLOPT_POSTFIELDS =>  /* '{"apiKey":"gu7XeGszu8S6b2pMfcJjDvUnTfiN7Wfv","cartItems":[{"name":"Vneckdd","imageURL":"vneck-tee.jpg","uPCEAN":123456789102,"standardCost":"18","standardQuantity":"1000","description":"Pellentesque habitant","Brand":"","longDescription":"Pellentesque","isTaxable":"Y","isSale":"N","isShipping":"","width ":"","Height":"","Depth":"","whlUnit":"","Weight":"","weightUnit":"","properitaryUrl":""}]}' */
-							  json_encode($product,true),
+							  CURLOPT_POSTFIELDS =>json_encode($product,true),
 							 
 							  CURLOPT_HTTPHEADER => array(
-								"Authorization: Basic YXBpS2V5Om5NanFSeTcxR1ZmSGFiam00cmQ0Sk13WkQ0MlRkVGlp",
+								"Authorization: Basic ".get_option('kach_merchat_secretKey'),
 								"Cache-Control: no-cache",
 								"Content-Type: application/json",
 								"Postman-Token: 80907bea-1054-4db3-a8fa-be87142b6f81",
-								"apiKey: nMjqRy71GVfHabjm4rd4JMwZD42TdTii"
+								"apiKey:".get_option('kach_merchat_apiKey')
 							  ),
 							));
 
@@ -117,15 +135,22 @@ Class OnePayFunctions
 							if ($err) {
 							  echo "cURL Error #:" . $err;
 							} else {
+								update_post_meta($item,'one_pay',true);
 							  echo $response;
 							}
 						
 						//$res=	$this->curl->HttpPost('buy/product/add',$product);
 						//var_dump($res);
-						die();
+						
 					}
 					
 				}
+				
+			}
+			else{
+				$a['success']=false;
+				
+				echo json_encode($a);wp_die();
 			}
 			
 		 }

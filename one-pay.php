@@ -38,6 +38,7 @@ define( 'OP_API_URL', 'https://app.kachyng.com/api/v2/' );
  */
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-one-pay-activator.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-register.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/html.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'curl/vendor/autoload.php';
 
@@ -107,6 +108,7 @@ function wpdocs_register_one_pay_menu_page() {
 }
 add_action( 'admin_menu', 'wpdocs_register_one_pay_menu_page' ); 
 add_action('admin_enqueue_scripts', 'load_onepay_scripts');
+add_action('wp_enqueue_scripts', 'load_onepay_scripts');
 
 
 function one_pay_menu(){
@@ -117,14 +119,22 @@ function one_pay_menu(){
 }
 
 function load_onepay_scripts(){
+	
+
+	 
+	 wp_enqueue_script('one-pay-jquery.min.js', plugins_url( 'one-pay/js/jquery.min.js' ));
 	 wp_enqueue_script('one-pay', plugins_url( 'one-pay/js/onepay.js' ));
+	 $user_logged=get_current_user_id()?true:false;
+	 
 	 wp_localize_script( 'one-pay', 'ajax_object',
-            array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1234 ) );
+            array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'user_logged' => $user_logged ) );
 }
 
 
 add_action( 'wp_ajax_nopriv_onepay_merchant_reg', 'OnePayRegisterAjax' );
 add_action( 'wp_ajax_onepay_merchant_reg', 'OnePayRegisterAjax' );
+add_action( 'wp_ajax_nopriv_onepay_user_register', 'OnePayUserRegisterAjax' );
+add_action( 'wp_ajax_onepay_user_register', 'OnePayUserRegisterAjax' );
 
 function OnePayRegisterAjax(){
 	$data['email']=$_POST['email'];
@@ -132,6 +142,16 @@ function OnePayRegisterAjax(){
 	
 	$OnePayRegister=new OnePayRegister;
 	$OnePRegister=$OnePayRegister->Register($data);
+	echo json_encode($OnePRegister);
+	wp_die();
+	
+}
+function OnePayUserRegisterAjax(){
+	$data['email']=$_POST['email'];
+	$data['name']=$_POST['name'];
+	
+	$OnePayRegister=new OnePayRegister;
+	$OnePRegister=$OnePayRegister->UserRegister($data);
 	echo json_encode($OnePRegister);
 	wp_die();
 	
@@ -168,9 +188,22 @@ function user_register_op( $order_id ) {
 		
 	}
 }
+function InserFbButton() {
+	$id=get_current_user_id();
+	if(!$id){
+		InserFbButtonHtml();
+		
+	}
+   
+}
+add_action( 'wp_footer', 'InserFbButton' );
 
 
-
+add_filter('pre_option_default_role', function($default_role){
+    // You can also add conditional tags here and return whatever
+    return 'customer'; // This is changed
+    return $default_role; // This allows default
+});
 
 
 

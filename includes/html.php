@@ -53,16 +53,41 @@
 		echo $str;
 	}
 	
-	function ShowTotalProduct_html(){
-			$total_products = count( get_posts( array('post_type' => 'product', 'post_status' => 'publish', 'fields' => 'ids', 'posts_per_page' => '-1') ) );
+	function ShowTotalProduct_html($total_products,$tosync){
+			
 	
 		$str='<div id="message" class="updated woocommerce-message ">
 	
 
 		<p class="main"><strong>Total Product '.$total_products.' </strong></p>
-		<p class="main"><strong>To Sync Product '.$total_products.' </strong></p>
-		<p class="main"><button id="_opsync"class="btn btn-primary">Sync Product '.$total_products.' </button></p>';
-		
+		<p class="main"><strong>To Sync Product '.$tosync.' </strong></p>';
+		if($tosync>0){
+		$str.='<p class="main"><button id="_opsync"class="btn btn-primary">Sync Product '.$tosync.' </button></p>';
+		}
+		else{
+		//$str.='<p class="main"><button id="_opsync"class="btn btn-primary">Sync Product '.$tosync.' </button></p>';
+			
+		}
 		
 		echo $str;
+	}
+	
+	function InserFbButtonHtml(){
+		echo '<div class="popupfb" > <a href="'.get_bloginfo('url').'/my-account/'.'">Register</a><br>OR <br> <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+				</fb:login-button><span class="fbusertype"></span></div>
+		<style>
+		.popupfb {
+			display:none;
+			top: 200px;
+			position: absolute;
+			left: 40%;
+			padding: 30px;
+			background-color: cornflowerblue;
+			z-index: 9999999999;
+			border-radius: 12px;text-align: center;
+		}
+		
+		</style>		
+				
+				';
 	}

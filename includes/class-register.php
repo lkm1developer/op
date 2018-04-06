@@ -123,6 +123,59 @@ class OnePayRegister {
 		return $res;
 		
 	}
+	
+	public function UserRegister($data){
+		
+		
+		
+		$user_data=array(
+		  "user"=>array(
+			"email"=> $data['email'],
+			"firstname"=>  $data['name'],
+			"lastname"=> $data['name'],
+			"authProvider"=>  "string",
+			"authProviderId"=>  "string",
+			"deviceVendor"=>  "string",
+			"deviceId"=>  "string",
+			"deviceName"=>  "string",
+			"deviceOsVersion"=>  "string"
+		  ));
+		 
+		$res=	$this->curl->HttpPost('accounts/sessions/create',$user_data);
+		if($res->success==true){
+		$user_id = username_exists( $data['email'] );
+			if ( !$user_id and email_exists($data['email']) == false ) {
+				$random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
+				$user_id = wp_create_user( $data['name'], $random_password, $data['email'] );
+				$email = $data['email'] ;
+				$user = get_user_by('email', $email );
+
+				// Redirect URL //
+				if ( !is_wp_error( $user ) )
+				{
+					wp_clear_auth_cookie();
+					wp_set_current_user ( $user_id );
+					wp_set_auth_cookie  ( $user_id );
+					update_option('kach_user'.$user_id,json_encode($res));
+					$url=get_bloginfo('url').'/my-account/edit-address/billing/';
+					return $res;
+					$a['success']=true;
+					$a['redirect']=$url;
+					return $a;
+				}
+			} else {
+				$a['success']=false;
+				$a['error'][]='User already exists.  Password inherited.';
+				return $a;
+			}	
+		}
+		else {
+				$a['success']=false;
+				$a['error'][]='Something went wrong!!';
+				return $a;
+			}	
+		
+	}
 
 	public function UserAddProduct($orderdata,$userdata){
 		
@@ -136,7 +189,7 @@ class OnePayRegister {
 			"authProvider"=>  "string",
 			"authProviderId"=>  "string"
 				),
-		  "cartItems"=>array(
+		  "cartItems"=>array([
 						
 						  "number"=>324,
 						  "name"=>  'hat',
@@ -144,17 +197,17 @@ class OnePayRegister {
 						  "upc"=>324,
 						  "active"=>true,
 						  "description"=> 'this is hat hat',
-						  "images"=> [
+						  "images"=> array(
 							""
-						  ],
-						  "package_dimensions"=> [
+						  ),
+						  "package_dimensions"=> array(
 													"height"=> 0,
 													"length"=>0,
 													"width"=> 0,
 													"length_unit"=> "string",
 													"weight"=> 0,
 													"weight_unit"=> "string"
-												 ],
+												 ),
 						  "shippable"=> true,
 						  "google_category"=> "string",
 						  "taxable"=> true,
@@ -162,7 +215,7 @@ class OnePayRegister {
 						  "sale_price"=> 10.99,
 						
 						  
-						  "cartAddress"=> [
+						  "cartAddress"=> array(
 											
 											  "addressLine1"=>$data['billing']['address_1'],
 											  "addressLine2"=> $data['billing']['address_2'],
@@ -171,8 +224,8 @@ class OnePayRegister {
 											  "region"=> $data['billing']['state'],
 											  "postalCode"=> $data['billing']['postcode']
 											
-										  ]
-						)
+										  )
+						])
 		  );
 		 $user_data=json_encode($user_data,true); 
 		echo '<pre>';  
