@@ -152,10 +152,10 @@ Class OnePayFunctions
 						'cartItems'=>array([
 						'name'=>$_product->name,
 						'imageURL'=>get_the_post_thumbnail_url( $item),						
-						'uPCEAN'=>123456789102,
+						'uPCEAN'=>1234567891 .$item,
 						'standardCost'=>$_product->price,
 						'standardQuantity'=>$_product->stock_quantity?$_product->stock_quantity:1000,
-						'description'=>$_product->description,
+						'description'=>substr($_product->description,0,30),
 						'Category'=>$cat,
 						'Brand'=>'',
 						'longDescription'=>$_product->description,
@@ -174,7 +174,7 @@ Class OnePayFunctions
 						
 						$data= (object)$data;
 						//var_dump($data);die();
-						echo json_encode($data);die();
+						//echo json_encode($data);die();
 						return $data;
 						
 		}
