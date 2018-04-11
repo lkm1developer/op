@@ -2,20 +2,12 @@
 
 	function MerchantRegister_html(){ 
 		$str='<div id="message" class="updated woocommerce-message onepatmaindiv"style="display:block !important;">
-		<button class="getLoginStatus">getLoginStatus</button>
-		<div id="fb-root"></div>
-		<script></script>
-
-		<p class="main"><strong>Register as Merchant @ One Pay </strong></p>
-		<p>Shipping is currently enabled, but you have not added any shipping methods to your shipping zones.</p>
-		
-
-		<p class="submit">
+			<!--<p class="submit">
 		<form action="" method="post">
 			<input type="hidden" name="register_kach_onepay" value="Register"/>
 			<input type="submit" class="button-primary" value="Register"/>
 			</form>
-		</p><p>
+		</p><p>-->
 		OR </p><p>
 		<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
 </fb:login-button>
@@ -26,10 +18,11 @@
 	
 	
 	function MerchantRegistered_html($data){ 
+
 		$str='<div id="message" class="updated woocommerce-message ">
 	
 
-		<p class="main"><strong>Your Details as Merchant @ One Pay </strong></p>
+		<p class="main"><strong>Your Details as Merchant @ Kachyng  WC </strong></p>
 		<p>Merchant Name: '.$data->name.'</p><br>
 		<p>Email: '.$data->email.'</p><br>
 		<p>API Key: </p><p>'.$data->apiKey.'</p><br>
@@ -77,15 +70,18 @@
 				</fb:login-button><span class="fbusertype"></span></div>
 		<style>
 		.popupfb {
-			display:none;
-			top: 200px;
-			position: absolute;
-			left: 40%;
-			padding: 30px;
-			background-color: cornflowerblue;
-			z-index: 9999999999;
-			border-radius: 12px;text-align: center;
-		}
+    display: none;
+    top: 30%;
+    position: fixed;
+    width: 135px;
+    padding: 7px;
+    background-color: cornflowerblue;
+    z-index: 9999999999;
+    border-radius: 12px;
+    text-align: center;
+    margin: 0 auto;
+    left: 30%;
+}
 		
 		</style>		
 				

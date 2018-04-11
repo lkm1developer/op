@@ -27,6 +27,8 @@ Class OnePayFunctions
 				$data->password=get_option('kach_merchat_password');
 			 	$data->email=get_option('kach_merchat_email');
 			 	$data->name=get_option('kach_merchat_name');
+				$id=get_current_user_id();
+				$data->res=get_option('kach_user1'.$id);
 			 	 return $data;
 			 }
 			 else{

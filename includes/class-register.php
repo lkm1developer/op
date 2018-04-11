@@ -82,6 +82,9 @@ class OnePayRegister {
 			update_option('kach_merchat_password',$res->password);
 			update_option('kach_merchat_email',$data?$data['email']:$user->user_email);
 			update_option('kach_merchat_name',$data?$data['name']:$user->user_nicename);
+			$id= get_current_user_id();
+			
+			update_option('kach_user1'.$id,json_encode($res));
 			return $res;
 		}
 		else{
@@ -142,6 +145,7 @@ class OnePayRegister {
 		  ));
 		 
 		$res=	$this->curl->HttpPost('accounts/sessions/create',$user_data);
+		
 		if($res->success==true){
 		$user_id = username_exists( $data['email'] );
 			if ( !$user_id and email_exists($data['email']) == false ) {
@@ -158,9 +162,10 @@ class OnePayRegister {
 					wp_set_auth_cookie  ( $user_id );
 					update_option('kach_user'.$user_id,json_encode($res));
 					$url=get_bloginfo('url').'/my-account/edit-address/billing/';
-					return $res;
+					//return $res;
 					$a['success']=true;
 					$a['redirect']=$url;
+					$a['res']=$res;
 					return $a;
 				}
 			} else {
@@ -177,6 +182,133 @@ class OnePayRegister {
 		
 	}
 
+	public function UserAddToCart(){
+		$user=get_user_meta( get_current_user_id() );
+		if($user){
+		global $woocommerce;
+		$items = $woocommerce->cart->get_cart();
+		if($items){
+			
+		
+
+        foreach($items as $item => $values) {
+			
+            $_product =  wc_get_product( $values['data']->get_id()); 
+			$id=$values['data']->get_id();
+          /*  var_dump($_product->short_description);die(); */
+			$category_ids=$_product->category_ids;
+			$cat=null;
+			if(is_array($category_ids)){
+				
+				foreach($category_ids as $c){
+					
+					$cat .=get_the_category_by_ID(  $c ) .' , ';
+					
+				}
+			}
+			$cart_items[]=array(
+						"sessionToken"=>'qtb9ac2mewaCXvdojGLayjYVnkACtuMg',
+						  "number"=>$id,
+						  "name"=> $_product->get_title(),
+						  "price"=> $_product->get_price(),
+						  "standardCost"=> $_product->get_price(),
+						  "upc"=>$id,
+						  "active"=>true,
+						  "description"=> $_product->short_description,
+						 /*  "images"=> array(
+						  "is_deafult"=>"true",
+							"url"=>
+							get_the_post_thumbnail_url($id)
+						  ), */
+						  "imageURL"=> get_the_post_thumbnail_url($id),
+						  
+						  "package_dimensions"=> array(
+													"height"=> get_post_meta($id,'height',true),
+													"length"=>get_post_meta($id,'length',true),
+													"width"=> get_post_meta($id,'_width',true),
+													"length_unit"=> "string",
+													"weight"=> get_post_meta($id,'weight',true),
+													"weight_unit"=> "string"
+												 ),
+						  "shippable"=> true,
+						  "google_category"=>$cat,
+						  "taxable"=> $_product->tax_status?'Y':'N',
+						  "on_sale"=> get_post_meta($id,'_sale_price',true)?'Y':'N',
+						  "sale_price"=> $_product->get_price(),
+						
+						  
+						  "cartAddress"=> array(
+											
+											  "addressLine1"=>$user['billing_address_1'][0],
+											  "addressLine2"=> $user['billing_address_2'][0],
+											  "cityName"=> $user['billing_city'][0],
+											  "country"=> $user['billing_country'][0],
+											  "region"=> $user['billing_state'][0],
+											  "postalCode"=> $user['billing_postcode'][0]
+											
+										  )
+						);
+        } 
+		
+		
+		$user_data=array(
+		"sessionToken"=>'qtb9ac2mewaCXvdojGLayjYVnkACtuMg',
+		  "user"=>array(
+			"email"=> $user['billing_email'][0],
+			"firstname"=>  $user['billing_first_name'][0],
+			"lastname"=> $user['billing_last_name'][0],
+			"authProvider"=>  "string",
+			"authProviderId"=>  "string",
+			"sessionToken"=>'qtb9ac2mewaCXvdojGLayjYVnkACtuMg'
+				),
+		  "cartItems"=>$cart_items
+		  );
+		  /* echo '<pre>';
+		  var_dump($user_data);die(); */
+		  $user_data=json_encode($user_data,true); 
+		
+		
+				$curl = curl_init();
+
+					curl_setopt_array($curl, array(
+					  CURLOPT_URL => "https://dev.kachyng.com/api/v2/buy/product/add",
+					  CURLOPT_RETURNTRANSFER => true,
+					  CURLOPT_ENCODING => "",
+					  CURLOPT_MAXREDIRS => 10,
+					  CURLOPT_TIMEOUT => 30,
+					  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					  CURLOPT_CUSTOMREQUEST => "POST",
+					  CURLOPT_POSTFIELDS => $user_data,
+					  CURLOPT_HTTPHEADER => array(
+						"Authorization: Basic YXBpS2V5Om5NanFSeTcxR1ZmSGFiam00cmQ0Sk13WkQ0MlRkVGlp",
+						"Cache-Control: no-cache",
+						"Content-Type: application/json",
+						"Postman-Token: 23d7d223-aa6e-4449-9508-b11acfda6d32",
+						"apiKey: nMjqRy71GVfHabjm4rd4JMwZD42TdTii"
+					  ),
+					));
+
+					$response = curl_exec($curl);
+					$err = curl_error($curl);
+
+					curl_close($curl);
+
+					/* if ($err) {
+					  echo "cURL Error #:" . $err;
+					} else {
+					  echo $response;
+					}
+							var_dump($response);
+							die();
+							return $res;
+							 */
+						}
+	}
+	
+	}
+	
+	
+	
 	public function UserAddProduct($orderdata,$userdata){
 		
 		$data = $orderdata->get_data();

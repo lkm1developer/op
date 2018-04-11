@@ -10,11 +10,11 @@ error_reporting(E_ALL);
  * @package           One_Pay
  *
  * @wordpress-plugin
- * Plugin Name:       OnePay
- * Plugin URI:        http://OnePay.com
+ * Plugin Name:       Kachyng-WC
+ * Plugin URI:        https://app.kachyng.com/docs
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           1.0.0
- * Author:            Lakhvinder
+ * Author:            Kachyng
  * Author URI:        http://example.com/
  * License:           Strictly Private and Confidential
  * Text Domain:       one-pay
@@ -97,8 +97,8 @@ add_shortcode('kachyng','kachyng');
 
 function wpdocs_register_one_pay_menu_page() {
     add_menu_page(
-        __( 'One Pay', 'One Pay' ),
-        'One Pay',
+        __( 'Kachyng WC', 'Kachyng WC' ),
+        'Kachyng WC',
         'manage_options',
         'one_pay_menu',
         'one_pay_menu',
@@ -120,15 +120,24 @@ function one_pay_menu(){
 
 function load_onepay_scripts(){
 	
-
-	 
-	 wp_enqueue_script('one-pay-jquery.min.js', plugins_url( 'one-pay/js/jquery.min.js' ));
-	 wp_enqueue_script('one-pay', plugins_url( 'one-pay/js/onepay.js' ));
+	/* $id= get_current_user_id();
+	$user =get_option('kach_user1');
+	
+	var_dump($user);var_dump($id);
+	die(); */ 
+	 wp_enqueue_script('one-pay-jquery.min.js', plugins_url( 'op-master/js/jquery.min.js' ));
+	 wp_enqueue_script('one-pay', plugins_url( 'op-master/js/onepay.js' ));
 	 $user_logged=get_current_user_id()?true:false;
 	 
 	 wp_localize_script( 'one-pay', 'ajax_object',
             array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'user_logged' => $user_logged ) );
 }
+ /* delete_option( 'kach_merchat_secretKey' );
+delete_option( 'kach_merchat_authenticationKey' );
+delete_option( 'kach_merchat_password' );
+delete_option( 'kach_merchat_apiKey' );
+delete_option( 'kach_merchat_email' );
+delete_option( 'kach_merchat_name' );  */
 
 
 add_action( 'wp_ajax_nopriv_onepay_merchant_reg', 'OnePayRegisterAjax' );
@@ -171,7 +180,24 @@ function OnePayProductSyncAjax(){
 	
 }
 
-add_action('woocommerce_thankyou', 'user_register_op', 10, 1);
+add_action('template_redirect','redirect_visitor');
+function redirect_visitor(){
+    $ck=is_checkout();
+	if($ck){
+		$Register=new OnePayRegister; 
+		$res=$Register->UserAddToCart();
+	}
+
+}
+
+
+
+
+
+
+
+
+//add_action('woocommerce_thankyou', 'user_register_op', 10, 1);
 function user_register_op( $order_id ) {
 
     if ( ! $order_id )
@@ -189,6 +215,8 @@ function user_register_op( $order_id ) {
 	}
 }
 function InserFbButton() {
+	//update_option('siteurl','http://naveen.store/');
+	
 	$id=get_current_user_id();
 	if(!$id){
 		InserFbButtonHtml();

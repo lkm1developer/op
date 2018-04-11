@@ -112,13 +112,25 @@ jQuery( document ).ready(function() {
 	});
 	jQuery('.add_to_cart_button').click(function(e){
 		
-		if(ajax_object.user_logged==false){
-		e.preventDefault();
-			alert();
-			jQuery('.popupfb').show();
-			return false			
-		}
+		// if(ajax_object.user_logged==false){
+		// e.preventDefault();
+		// 	alert();
+		// 	jQuery('.popupfb').show();
+		// 	return false			
+		// }
 		
 		
 	});
+	if(ajax_object.user_logged==false){
+		
+		var IsCheckoutPage=jQuery('.woocommerce-account-fields').length;
+		
+		if(IsCheckoutPage==1){
+			jQuery('.site').css ('opacity', .1);
+
+			jQuery('.popupfb').show();
+			
+		}
+	};
+	
 });
